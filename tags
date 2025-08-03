@@ -1,0 +1,48 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+CC	Makefile	/^CC=gcc$/;"	m
+CFLAGS	Makefile	/^CFLAGS=-Wall$/;"	m
+DATA_SPLIT	mapreduce.h	/^}DATA_SPLIT;$/;"	t	typeref:struct:_data_split
+DEBUG	common.h	11;"	d
+DEBUG_MSG	common.h	13;"	d
+DEBUG_MSG	common.h	15;"	d
+ERROR	common.h	7;"	d
+ERR_MSG	common.h	18;"	d
+EXIT_ERROR	common.h	20;"	d
+MAPREDUCE_RESULT	mapreduce.h	/^}MAPREDUCE_RESULT;$/;"	t	typeref:struct:_mapreduce_result
+MAPREDUCE_SPEC	mapreduce.h	/^}MAPREDUCE_SPEC;$/;"	t	typeref:struct:_mapreduce_spec
+SUCCESS	common.h	6;"	d
+TARGET	Makefile	/^TARGET=run-mapreduce$/;"	m
+US_PER_SEC	common.h	9;"	d
+_COMMON_H	common.h	4;"	d
+_EXIT_ERROR	common.h	27;"	d
+_MAPREDUCE_H	mapreduce.h	4;"	d
+_USR_FUNCTIONS_H	usr_functions.h	4;"	d
+_data_split	mapreduce.h	/^typedef struct _data_split$/;"	s
+_mapreduce_result	mapreduce.h	/^typedef struct _mapreduce_result$/;"	s
+_mapreduce_spec	mapreduce.h	/^typedef struct _mapreduce_spec$/;"	s
+fd	mapreduce.h	/^    int fd;  \/* The file descriptor of the input data file *\/$/;"	m	struct:_data_split
+filepath	mapreduce.h	/^    char * filepath; \/* The path of the result file *\/$/;"	m	struct:_mapreduce_result
+input_data_filepath	mapreduce.h	/^    char * input_data_filepath; \/* The path of the (large) input data file *\/$/;"	m	struct:_mapreduce_spec
+is_regular_file	main.c	/^int is_regular_file(char * file_path)$/;"	f
+letter_counter_map	usr_functions.c	/^int letter_counter_map(DATA_SPLIT * split, int fd_out)$/;"	f
+letter_counter_reduce	usr_functions.c	/^int letter_counter_reduce(int * p_fd_in, int fd_in_num, int fd_out)$/;"	f
+main	main.c	/^int main(int argc, char * argv[])$/;"	f
+map_func	mapreduce.h	/^    int (*map_func)(DATA_SPLIT * split, int fd_out); \/* Function pointer to the user-defined map function *\/$/;"	m	struct:_mapreduce_spec
+map_worker_pid	mapreduce.h	/^    int * map_worker_pid; \/* To record the process IDs of the map worker processes *\/$/;"	m	struct:_mapreduce_result
+mapreduce	mapreduce.c	/^void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)$/;"	f
+print_usage	main.c	/^void print_usage(char * cmd_name)$/;"	f
+processing_time	mapreduce.h	/^    int processing_time; \/* The time used (in microseconds) for the mapreduce task *\/$/;"	m	struct:_mapreduce_result
+reduce_func	mapreduce.h	/^    int (*reduce_func)(int * p_fd_in, int fd_in_num, int fd_out); \/* Function pointer to the user-defined reduce function *\/$/;"	m	struct:_mapreduce_spec
+reduce_worker_pid	mapreduce.h	/^    int reduce_worker_pid; \/* To record the process ID of the reduce worker *\/$/;"	m	struct:_mapreduce_result
+size	mapreduce.h	/^    int size; \/* The size of the split *\/$/;"	m	struct:_data_split
+split_num	mapreduce.h	/^    int split_num; \/* The number of splits *\/$/;"	m	struct:_mapreduce_spec
+str_is_decimal_num	main.c	/^int str_is_decimal_num(char * str)$/;"	f
+usr_data	mapreduce.h	/^    void * usr_data;  \/* This field is used only by the "Word finder" program: it records the word to find in the input data file *\/$/;"	m	struct:_data_split
+usr_data	mapreduce.h	/^    void * usr_data; \/* This field is used only by the "Word finder" program: it records the word to find in the input data file *\/$/;"	m	struct:_mapreduce_spec
+word_finder_map	usr_functions.c	/^int word_finder_map(DATA_SPLIT * split, int fd_out)$/;"	f
+word_finder_reduce	usr_functions.c	/^int word_finder_reduce(int * p_fd_in, int fd_in_num, int fd_out)$/;"	f
