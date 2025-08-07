@@ -25,33 +25,23 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
 	return;
     }
     // add your code here ...
-    long int spec_file_size = st.st_size;
-    long int split_size = spec_file_size / spec->split_num;
-    char digits_buffer[30]; //long long int will have 19 digits/bytes maximum + 1~2 so around 21 bytes
-    snprintf(digits_buffer,sizeof(digits_buffer),"%ld",split_size); //converts the long int to a character byte buffer NULL TERMINATED
-    //long int remainder = spec_file_size % spec->split_num;
-    printf("Size of split files: %ld\n", split_size);
-    printf("%s\n",digits_buffer);
-    //printf("Remaining bytes: %ld\n", remainder);
-    char *command = "split --numeric-suffixes --additional-suffix=.txt -b "; 
-    size_t len1 = strlen(command);
-    size_t len2 = strlen(digits_buffer);
-    size_t len3 = strlen(spec->input_data_filepath);
-    size_t len = len1 + len2 + len3 + 1 + 1; // + 1 for NULL terminated and one extra space
-    char *system_command = malloc(len); 
-    char *current_pos = system_command;
-    memcpy(current_pos,command,strlen(command));
-    current_pos += len1;
-    memcpy(current_pos,digits_buffer,len2);
-    current_pos += len2;
-    *current_pos = ' ';
-    current_pos += 1;
-    memcpy(current_pos,spec->input_data_filepath,len3);
-    current_pos += len3;
-    *current_pos = '\0';
-    printf("Concatenated string: %s\n",system_command);
-    system(system_command);
-    free(system_command);
+    FILE *pipe_fp;
+    char command[100];
+    char line_count[30];
+    snprintf(command,sizeof(command),"wc -l %s | awk \'{print $1}\'",spec->input_data_filepath); 
+    printf("Command to get line numbers: %s\n",command);
+    pipe_fp = popen(command,"r");
+    fgets(line_count,sizeof(line_count),pipe_fp);
+    printf("Captured line_count: %s\n", line_count);
+    long long int line_count_l = strtoll(line_count,NULL,10);
+    long long int div = line_count_l / spec->split_num; //Line numbers per split
+    //OPTIONAL strtok(line_count,"\n"); //removes new line
+    //printf("Converted to long data type: %lld\n", line_count);
+    
+    char *split_command = "split --numeric-suffixes --additional-suffix=.txt --lines=";
+    snprintf(command,sizeof(command),"%s%lld %s",split_command,div,spec->input_data_filepath);
+    printf("Split command: %s\n", command);
+    system(command);
     // Create N worker threads.
     int num_workers = spec->split_num;
 
