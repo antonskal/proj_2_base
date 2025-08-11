@@ -28,7 +28,6 @@ typedef struct _mapreduce_result
     int reduce_worker_pid; /* To record the process ID of the reduce worker */
 }MAPREDUCE_RESULT;
 
-
 void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result);
 
 

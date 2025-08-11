@@ -1,5 +1,5 @@
 TARGET=run-mapreduce
-CFLAGS=-Wall
+CFLAGS=-Wall -g
 CC=gcc
 
 all: $(TARGET)

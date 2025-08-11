@@ -6,7 +6,7 @@
 
 #include "common.h"
 #include "usr_functions.h"
-
+#define BUFFSIZE 4096
 /* User-defined map function for the "Letter counter" task.  
    This map function is called in a map worker process.
    @param split: The data split that the map function is going to work on.
@@ -18,7 +18,28 @@
 int letter_counter_map(DATA_SPLIT * split, int fd_out)
 {
     // add your implementation here ...
-    
+    long int counts[26] = {0};
+    char buf[BUFFSIZE] = {0};
+    int n;
+    while ((n = read(split->fd,buf,BUFFSIZE)) > 0)
+    {
+    	for (int i = 0; i < n; i++)
+	{
+		if(isalpha((unsigned char)buf[i])) 
+		{
+			char letter = tolower((unsigned char)buf[i]);
+			counts[letter-'a']++;
+		}
+	}
+    }
+   for (int i = 0; i < 26; i++)
+   {
+	char output_line[30];
+	char letter = 'A' + i;
+	int len = snprintf(output_line,sizeof(output_line),"%c %d\n",letter,counts[i]);
+	write(fd_out,output_line,len);
+   }
+
     return 0;
 }
 
