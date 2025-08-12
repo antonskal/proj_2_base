@@ -6,9 +6,13 @@
 // add your code here ...
 #include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <sys/wait.h>
 struct stat st;
 mode_t permissions = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+int fd_table[256];
 void split_file_by_lines(char *filepath,int n)
 {
 
@@ -30,32 +34,8 @@ void split_file_by_lines(char *filepath,int n)
     printf("Split command: %s\n", command);
     system(command);
 }
-
-
-void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
+void mapwrapper(int i, MAPREDUCE_SPEC *spec)
 {
-    // add you code here ...
-    //original_fd = open(spec->input_data_filepath,O_RDONLY);
-    split_file_by_lines(spec->input_data_filepath,spec->split_num);
-    struct timeval start, end;
-
-    if (NULL == spec || NULL == result)
-    {
-        EXIT_ERROR(ERROR, "NULL pointer!\n");
-    }
-    
-    gettimeofday(&start, NULL);
-    if (stat(spec->input_data_filepath,&st) == -1)
-    {
-	printf("ERROR getting file status");
-	return;
-    }
-    // add your code here ...
-    // Create N worker threads.
-    int num_workers = spec->split_num;
-    for (int i = 0; i < num_workers; i++)
-    {
-	//pid_t pid = fork();
 	char filename[30];
 	snprintf(filename,sizeof(filename),"x%02d.txt",i);
 	printf("Looking at file: %s\n",filename);
@@ -69,11 +49,58 @@ void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
 	snprintf(outfilename,sizeof(outfilename),"mr-%d.itm",i);
 	int fd_out = open(outfilename,O_WRONLY | O_CREAT | O_TRUNC, permissions);	
 	spec->map_func(&data,fd_out);
+	fd_table[i] = fd_out;
+}
+
+
+void mapreduce(MAPREDUCE_SPEC * spec, MAPREDUCE_RESULT * result)
+{
+    // add you code here ...
+    //original_fd = open(spec->input_data_filepath,O_RDONLY);
+    split_file_by_lines(spec->input_data_filepath,spec->split_num);
+    struct timeval start, end;
+    
+    gettimeofday(&start, NULL);
+    if (stat(spec->input_data_filepath,&st) == -1)
+    {
+	printf("ERROR getting file status");
+	return;
     }
+    // add your code here ...
+    // Create N worker threads.
+    int num_workers = spec->split_num;
+    pid_t pids[256] = {0};
+    for (int i = 0; i < num_workers; i++)
+    {
+	pid_t pid = fork();
+	if (pid == 0)
+	{
+		pids[i] = pid;
+		if (i == 0)
+		{
+			mapwrapper(i,spec);
+			pause();
+			printf("Child entering reduce phase");
+			int fd_out = open("mr.rst",O_WRONLY | O_CREAT | O_TRUNC, permissions);	
+			spec->reduce_func(fd_table,num_workers,fd_out,num_workers);			
+		}
+		else
+		{
+			mapwrapper(i,spec);
+			exit(0);
+		}
+	}
+	
+    }
+   int status; 
+   for (int i = 1; i < num_workers; i++)
+   {
+ 	waitpid(pids[i],&status,0);
+	printf("Worker with PID %d finished with status %d.\n",pids[i],status);
+   }
 
-   
-// call split on file using system
-//system("split --bytes=split_size 
+   kill(pids[0],SIGUSR1);
 
-    result->processing_time = (end.tv_sec - start.tv_sec) * US_PER_SEC + (end.tv_usec - start.tv_usec);
+   waitpid(pids[0],&status,0);
+   result->processing_time = (end.tv_sec - start.tv_sec) * US_PER_SEC + (end.tv_usec - start.tv_usec);
 }

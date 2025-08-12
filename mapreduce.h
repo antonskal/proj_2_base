@@ -16,7 +16,7 @@ typedef struct _mapreduce_spec
     char * input_data_filepath; /* The path of the (large) input data file */
     int split_num; /* The number of splits */
     int (*map_func)(DATA_SPLIT * split, int fd_out); /* Function pointer to the user-defined map function */
-    int (*reduce_func)(int * p_fd_in, int fd_in_num, int fd_out); /* Function pointer to the user-defined reduce function */
+    int (*reduce_func)(int * p_fd_in, int fd_in_num, int fd_out,int split_num); /* Function pointer to the user-defined reduce function */
     void * usr_data; /* This field is used only by the "Word finder" program: it records the word to find in the input data file */
 }MAPREDUCE_SPEC;
 

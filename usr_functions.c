@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
-
+#include <ctype.h>
 #include "common.h"
 #include "usr_functions.h"
 #define BUFFSIZE 4096
@@ -36,7 +36,7 @@ int letter_counter_map(DATA_SPLIT * split, int fd_out)
    {
 	char output_line[30];
 	char letter = 'A' + i;
-	int len = snprintf(output_line,sizeof(output_line),"%c %d\n",letter,counts[i]);
+	int len = snprintf(output_line,sizeof(output_line),"%c %ld\n",letter,counts[i]);
 	write(fd_out,output_line,len);
    }
 
@@ -55,10 +55,36 @@ int letter_counter_map(DATA_SPLIT * split, int fd_out)
              identified by p_fd_in[0], p_fd_in[1], and p_fd_in[2] respectively.
 
 */
-int letter_counter_reduce(int * p_fd_in, int fd_in_num, int fd_out)
+int letter_counter_reduce(int * p_fd_in, int fd_in_num, int fd_out, int n)
 {
     // add your implementation here ...
-    
+    long long int cnt [26] = {0};
+    for (int i = 0; i < n; i++) 
+    {
+	lseek(p_fd_in[i],0,SEEK_SET);
+	FILE *fp = fdopen(p_fd_in[i],"r");
+	char line[128];
+	while (fgets(line,sizeof(line),fp) != NULL)
+	{
+		char letter;
+		long int count;
+		if (sscanf(line,"%c %ld", &letter, &count) == 2)
+		{
+			cnt[letter-'a']+=count;
+			
+		}
+	}
+
+    } 
+
+    FILE *fp_out = fdopen(fd_out,"w");
+    for (int i = 0; i < 26; i++)
+    {
+	char letter = 'A' + i;
+	fprintf(fp_out, "%c %lld\n", letter, cnt[i]);
+
+    }
+    fclose(fp_out);
     return 0;
 }
 
@@ -89,7 +115,7 @@ int word_finder_map(DATA_SPLIT * split, int fd_out)
              identified by p_fd_in[0], p_fd_in[1], and p_fd_in[2] respectively.
 
 */
-int word_finder_reduce(int * p_fd_in, int fd_in_num, int fd_out)
+int word_finder_reduce(int * p_fd_in, int fd_in_num, int fd_out,int n)
 {
     // add your implementation here ...
     
